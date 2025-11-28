@@ -1,7 +1,6 @@
 {
   "name": "social-downloader-backend",
   "version": "1.0.0",
-  "description": "Backend server for social media downloader",
   "main": "server.js",
   "type": "module",
   "scripts": {
