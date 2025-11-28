@@ -6,37 +6,37 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Test route
+app.get("/facebook/test", (req, res) => {
+    res.send("Facebook endpoint working!");
+});
+
 app.get("/", (req, res) => {
-  res.send("Backend is running!");
+    res.send("Social Downloader Backend Running");
 });
 
-// --------------------- FACEBOOK DOWNLOADER ---------------------
+// FACEBOOK DOWNLOADER ROUTE
 app.post("/facebook", async (req, res) => {
-  try {
-    const { url } = req.body;
+    try {
+        const { url } = req.body;
+        if (!url) return res.json({ error: "No URL provided" });
 
-    if (!url) return res.json({ error: "URL missing" });
+        const api = `https://api.snapinsta.app/api/facebook?url=${encodeURIComponent(url)}`;
+        const response = await axios.get(api);
 
-    const api = `https://api.savetube.su/info?url=${encodeURIComponent(url)}`;
+        if (!response.data || !response.data.media || !response.data.media[0]) {
+            return res.json({ error: "Video not found" });
+        }
 
-    const response = await axios.get(api);
-    const data = response.data;
+        return res.json({
+            success: true,
+            download: response.data.media[0].url
+        });
 
-    if (!data || !data.url) {
-      return res.json({ error: "Video not found" });
+    } catch (error) {
+        console.error(error);
+        res.json({ error: "Server error fetching video" });
     }
-
-    return res.json({
-      success: true,
-      download: data.url
-    });
-  } catch (err) {
-    console.error(err);
-    res.json({ error: "Server Error" });
-  }
 });
 
-// ---------------------------------------------------------------
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(3000, () => console.log("Backend running on port 3000"));
