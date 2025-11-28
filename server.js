@@ -6,17 +6,17 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Test route
+// Test Route
 app.get("/facebook/test", (req, res) => {
     res.send("Facebook endpoint working!");
 });
 
-// Root route
+// Root Route
 app.get("/", (req, res) => {
     res.send("Social Downloader Backend Running");
 });
 
-// Facebook downloader
+// Facebook Downloader Route
 app.post("/facebook", async (req, res) => {
     try {
         const { url } = req.body;
@@ -31,7 +31,7 @@ app.post("/facebook", async (req, res) => {
 
         return res.json({
             success: true,
-            download: response.data.media[0].url
+            download: response.data.media[0].url,
         });
 
     } catch (error) {
@@ -40,7 +40,7 @@ app.post("/facebook", async (req, res) => {
     }
 });
 
-// Required for Railway
+// Railway PORT (Important)
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log("Backend running on port " + PORT);
