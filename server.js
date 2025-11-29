@@ -6,42 +6,108 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Test Route
-app.get("/facebook/test", (req, res) => {
-    res.send("Facebook endpoint working!");
-});
-
-// Root Route
+// =========================
+// TEST ROUTES
+// =========================
 app.get("/", (req, res) => {
     res.send("Social Downloader Backend Running");
 });
 
-// Facebook Downloader Route
+app.get("/facebook/test", (req, res) => {
+    res.send("Facebook endpoint working!");
+});
+
+// =========================
+// FACEBOOK DOWNLOADER
+// =========================
 app.post("/facebook", async (req, res) => {
     try {
         const { url } = req.body;
         if (!url) return res.json({ error: "No URL provided" });
 
-        const api = `https://api.snapinsta.app/api/facebook?url=${encodeURIComponent(url)}`;
-        const response = await axios.get(api);
+        const api = `https://fbdownloader-api.vercel.app/api?url=${encodeURIComponent(url)}`;
 
-        if (!response.data || !response.data.media || response.data.media.length === 0) {
+        const response = await axios.get(api, {
+            headers: { "User-Agent": "Mozilla/5.0" }
+        });
+
+        if (!response.data || !response.data.download) {
             return res.json({ error: "Video not found" });
         }
 
         return res.json({
             success: true,
-            download: response.data.media[0].url,
+            download: response.data.download[0].url
         });
 
     } catch (error) {
-        console.error(error);
+        console.error("Facebook fetch error:", error.message);
         res.json({ error: "Server error fetching video" });
     }
 });
 
-// Railway PORT (Important)
+// =========================
+// INSTAGRAM DOWNLOADER
+// =========================
+app.post("/instagram", async (req, res) => {
+    try {
+        const { url } = req.body;
+        if (!url) return res.json({ error: "No URL provided" });
+
+        const api = `https://instagram-downloader-api.vercel.app/api?url=${encodeURIComponent(url)}`;
+
+        const response = await axios.get(api, {
+            headers: { "User-Agent": "Mozilla/5.0" }
+        });
+
+        if (!response.data || !response.data.url) {
+            return res.json({ error: "Video not found" });
+        }
+
+        return res.json({
+            success: true,
+            download: response.data.url
+        });
+
+    } catch (error) {
+        console.error("Instagram fetch error:", error.message);
+        res.json({ error: "Server error fetching video" });
+    }
+});
+
+// =========================
+// TIKTOK DOWNLOADER
+// =========================
+app.post("/tiktok", async (req, res) => {
+    try {
+        const { url } = req.body;
+        if (!url) return res.json({ error: "No URL provided" });
+
+        const api = `https://tiktok-download-api.vercel.app/?url=${encodeURIComponent(url)}`;
+
+        const response = await axios.get(api, {
+            headers: { "User-Agent": "Mozilla/5.0" }
+        });
+
+        if (!response.data || !response.data.video) {
+            return res.json({ error: "Video not found" });
+        }
+
+        return res.json({
+            success: true,
+            download: response.data.video.noWatermark
+        });
+
+    } catch (error) {
+        console.error("TikTok fetch error:", error.message);
+        res.json({ error: "Server error fetching video" });
+    }
+});
+
+// =========================
+// SERVER START
+// =========================
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log("Backend running on port " + PORT);
+    console.log(`Backend running on port ${PORT}`);
 });
