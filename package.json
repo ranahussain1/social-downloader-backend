@@ -1,6 +1,7 @@
 {
   "name": "social-downloader-backend",
   "version": "1.0.0",
+  "description": "Social Media Video Downloader Backend",
   "main": "server.js",
   "type": "module",
   "scripts": {
